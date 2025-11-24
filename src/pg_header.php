@@ -8,7 +8,7 @@
 <div id="navbar">
 
 <?php
-echo $_SESSION['user_name'] ?? '', '&nbsp;$nbsp;&nbsp;';
+echo $_SESSION['user_name'] ?? '', ' &nbsp;&nbsp;&nbsp;';
 echo '<a href="?do=rst_list">HOME</a>&nbsp;&nbsp&nbsp;';
 if (isset($_SESSION['usertype_id'])){
   
