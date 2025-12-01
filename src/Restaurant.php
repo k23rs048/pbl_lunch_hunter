@@ -35,7 +35,7 @@ class Restaurant extends Model
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
+ /*
     // 店舗登録
     public function insert($data)
     {
@@ -53,4 +53,5 @@ class Restaurant extends Model
     {
         return parent::delete($where);
     }
+    */
 }
