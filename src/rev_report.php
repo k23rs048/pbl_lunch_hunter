@@ -19,7 +19,7 @@ $reports = $reports ?? [
         "reporter" => "通報者",
     ]
 ];
-
+?>
 
 
 <!DOCTYPE html>
