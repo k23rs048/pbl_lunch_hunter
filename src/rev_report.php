@@ -1,4 +1,5 @@
-$reports = [
+<?php
+$reports = $reports ?? [
     [
         "account" => "タックン",
         "rating" => 2,
