@@ -1,6 +1,7 @@
 <?php
 $reports = [
     [
+        'id'          => 1 ,
         'アカウント名' => 'タックン',
         '評価点'       => '2',
         'ジャンル'     => 'ラーメン',
@@ -10,6 +11,7 @@ $reports = [
         '本名'         => '美輪 明宏',
     ],
     [
+        'id'          => 2 ,
         'アカウント名' => 'アカウント名',
         '評価点'       => '4',
         'ジャンル'     => '店舗名',
@@ -36,9 +38,9 @@ $reports = [
 <h1>通報済み口コミ一覧表示</h1>
 
 <div class="top-btn">
-    <button type="button" onclick="location.href='.php?id=<?php $r['id']?? 0 ?>'">通報取り消し一覧</button>
-    <button type="button" onclick="location.href='.php?id=<?php $r['id']?? 0 ?>'">非表示</button>
-    <button type="button" onclick="location.href='.php?id=<?php $r['id']?? 0 ?>'">投稿の古い順</button>
+    <button type="button" onclick="location.href='.php?id=<?php echo $r['id']?? 0 ?>'">通報取り消し一覧</button>
+    <button type="button" onclick="location.href='.php?id=<?php echo $r['id']?? 0 ?>'">非表示</button>
+    <button type="button" onclick="location.href='.php?id=<?php echo $r['id']?? 0 ?>'">投稿の古い順</button>
 </div>
 
 
@@ -68,9 +70,9 @@ $reports = [
             <p>通報内容：<?php echo htmlspecialchars($r['通報理由']) ?></p>
 
             <!-- 遷移ボタン（ID を URL パラメータとして渡す） -->
-            <button type="button" onclick="location.href='detail.php?id=<?php $r['id']?? 0 ?>'">詳細</button>
-            <button type="button" onclick="location.href='cancel.php?id=<?php $r['id']?? 0 ?>'">取り消し</button>
-            <button type="button" onclick="location.href='delete.php?id=<?php $r['id']?? 0 ?>'">削除</button>
+            <button type="button" onclick="location.href='detail.php?id=<?php echo $r['id']?? 0 ?>'">詳細</button>
+            <button type="button" onclick="location.href='cancel.php?id=<?php echo $r['id']?? 0 ?>'">取り消し</button>
+            <button type="button" onclick="location.href='delete.php?id=<?php echo $r['id']?? 0 ?>'">削除</button>
         </div>
 
     </section>
