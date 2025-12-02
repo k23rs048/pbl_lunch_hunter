@@ -1,25 +1,25 @@
 <?php
 $reports = array(
     [
-        'id'          => '1' ,
-        'アカウント名' => 'タックン',
-        '評価点'       => '2',
-        'ジャンル'     => 'ラーメン',
-        '通報理由'     => '写真',
-        'コメント'     => '店主が臭い',
-        '通報者'       => '九尾 太郎',
-        '本名'         => '美輪 明宏',
+        'id'=> '1',
+        'アカウント名'=> 'タックン',
+        '評価点'=> '2',
+        'ジャンル'=> 'ラーメン',
+        '通報理由'=> '写真',
+        'コメント'=> '店主が臭い',
+        '通報者'=> '九尾 太郎',
+        '本名'=> '美輪 明宏',
     ],
     [
-        'id'          => '2' ,
-        'アカウント名' => 'アカウント名',
-        '評価点'       => '4',
-        'ジャンル'     => '店舗名',
-        '通報理由'     => 'コメント',
-        'コメント'     => 'コメント一部',
-        '通報者'       => '通報者',
-        '本名'         => '投稿主',
-    ]
+        'id'=> '2',
+        'アカウント名'=> 'アカウント名',
+        '評価点'=> '4',
+        'ジャンル'=> '店舗名',
+        '通報理由'=> 'コメント',
+        'コメント'=> 'コメント一部',
+        '通報者'=> '通報者',
+        '本名'=> '投稿主',
+    ] 
 );
 ?>
 
@@ -43,35 +43,35 @@ $reports = array(
 </div>
 
 
-<?php foreach ($reports as $r): ?>
+<?php foreach ($reports as $report): ?>
     <section class="report-box">
 
         <div class="left">
-            <h3><?php echo htmlspecialchars($r['アカウント名']) ?></h3>
+            <h3><?php echo htmlspecialchars($report['アカウント名']) ?></h3>
 
             <div class="star">
-                <p>評価：<?php echo $r['評価点']?></p>
+                <p>評価：<?php echo $report['評価点']?></p>
                 <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <?php echo $i<=(int)$r['評価点'] ? "★" : "☆" ?>
+                    <?php echo $i<=(int)$report['評価点'] ? "★" : "☆" ?>
                 <?php endfor; ?>
             </div>
 
-            <p><?php echo htmlspecialchars($r['コメント']) ?></p>
+            <p><?php echo htmlspecialchars($report['コメント']) ?></p>
 
             <div class="small">
-                <p>投稿主：<?php echo htmlspecialchars($r['通報者']) ?></p><br>
-                <p>通報者：<?php echo htmlspecialchars($r['本名']) ?></p>
+                <p>投稿主：<?php echo htmlspecialchars($report['通報者']) ?></p><br>
+                <p>通報者：<?php echo htmlspecialchars($report['本名']) ?></p>
             </div>
         </div>
 
         <div class="right">
-            <h3>#<?php echo htmlspecialchars($r['ジャンル']) ?></h3>
-            <p>通報内容：<?php echo htmlspecialchars($r['通報理由']) ?></p>
+            <h3>#<?php echo htmlspecialchars($report['ジャンル']) ?></h3>
+            <p>通報内容：<?php echo htmlspecialchars($report['通報理由']) ?></p>
 
             <!-- 遷移ボタン（ID を URL パラメータとして渡す） -->
-            <button type="button" onclick="location.href='detail.php?id=<?php echo $r['id']?? 0 ?>'">詳細</button>
-            <button type="button" onclick="location.href='cancel.php?id=<?php echo $r['id']?? 0 ?>'">取り消し</button>
-            <button type="button" onclick="location.href='delete.php?id=<?php echo $r['id']?? 0 ?>'">削除</button>
+            <button type="button" onclick="location.href='detail.php?id=<?php echo $report['id']?? 0 ?>'">詳細</button>
+            <button type="button" onclick="location.href='cancel.php?id=<?php echo $report['id']?? 0 ?>'">取り消し</button>
+            <button type="button" onclick="location.href='delete.php?id=<?php echo $report['id']?? 0 ?>'">削除</button>
         </div>
 
     </section>
