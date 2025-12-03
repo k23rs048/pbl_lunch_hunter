@@ -116,14 +116,17 @@ class User extends Model
     {
         return $this->getDetail("uid='{$uid}' AND upass='{$upass}'");
     }
+    //姓名結合
     function username($user){
         $username = "{$user['user_l_name']}_{$user['user_f_name']}";
         return $username;
     }
+    //フリガナ結合
     function userkana($user){
         $userkana = "{$user['user_l_kana']}_{$user['user_f_kana']}";
         return $userkana;
     }
+    //ユーザ詳細
     function get_Userdetail($where){
         $user = $this->getDetail($where);
         if(empty($user)) return [];
@@ -138,6 +141,7 @@ class User extends Model
         $user['userkana'] = $this->userkana($user);
         return $user;
     }
+    //ユーザリスト
     function get_userlist($where=1, $orderby=null, $limit=0, $offset=0){
         $sql = "SELECT * FROM t_user NATURAL JOIN t_usertype WHERE {$where}";
         $users =  $this->query($sql,$orderby, $limit, $offset);
@@ -146,7 +150,7 @@ class User extends Model
             $user['userkana'] = $this->userkana($user);
         }
         unset($user);
-        
+
         return $users;
     }
 }
