@@ -35,7 +35,7 @@ create table t_rstinfo(
     , tel_num VARCHAR(32) not null comment '電話番号'
     , rst_holiday INT not null comment '店休日'
     , rst_pay INT comment '支払い方法'
-    , rst_infl VARCHAR(2048) comment '店舗URL'
+    , rst_info VARCHAR(2048) comment '店舗URL'
     , photo1 BLOB comment '写真'
     , user_id CHAR(16) not null comment '登録ユーザID'
     , discount BOOLEAN not null comment '割引登録'
