@@ -9,13 +9,7 @@ $store = [
   'parking' => 'なし',
   'payment' => '現金 クレジットカード',
   'url' => 'https://www.example.com',
-  'photo' => 'photo_sample.jpg',
-  'review_avg' => '4.2',
-  'review_count' => '128',
-  'taste' => 5,
-  'price' => 4,
-  'atmosphere' => 4,
-  'service' => 4
+  'photo' => 'photo_sample.jpg'
 ];
 
 // 仮の口コミデータ
@@ -24,6 +18,15 @@ $reviews = [
   ['account_name' => '社員B', 'rating' => 4, 'comment' => '接客が丁寧でした。', 'photo' => 'gyoza.jpg'],
   ['account_name' => '社員C', 'rating' => 3, 'comment' => '値段が少し高めでした。', 'photo' => '']
 ];
+
+// 総合評価の平均を算出
+$total_rating = 0;
+foreach ($reviews as $r) {
+  $total_rating += $r['rating'];
+}
+$review_count = count($reviews);
+$review_avg = $review_count > 0 ? round($total_rating / $review_count, 1) : 0;
+$review_stars = str_repeat('★', floor($review_avg)) . str_repeat('☆', 5 - floor($review_avg));
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -36,20 +39,11 @@ $reviews = [
     .section { margin-bottom: 30px; }
     label { font-weight: bold; display: block; margin-top: 10px; }
     img { max-width: 100%; height: auto; margin-top: 10px; }
-    .nav_buttons button { margin-right: 10px; }
     .review_card { border: 1px solid #ccc; padding: 10px; margin-top: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Lunch Hunt</h1>
-    <div class="nav_buttons">
-      <button onclick="location.href='logout.php'">ログアウト</button>
-      <button onclick="location.href='mypage.php'">マイページ</button>
-      <button onclick="alert('お気に入りに登録しました')">お気に入り</button>
-      <button onclick="location.href='store_edit.php'">編集</button>
-    </div>
-
     <!-- 店舗情報 -->
     <div class="section">
       <h2>店舗詳細</h2>
@@ -65,14 +59,10 @@ $reviews = [
       <img src="<?= $store['photo'] ?>" alt="店舗外観">
     </div>
 
-    <!-- 評価 -->
+    <!-- 総合評価 -->
     <div class="section">
-      <h3>評価</h3>
-      <p><strong>総合評価：</strong><?= $store['review_avg'] ?> / 5（<?= $store['review_count'] ?>人）</p>
-      <p><strong>味：</strong><?= str_repeat('★', $store['taste']) ?></p>
-      <p><strong>値段：</strong><?= str_repeat('★', $store['price']) ?><?= str_repeat('☆', 5 - $store['price']) ?></p>
-      <p><strong>雰囲気：</strong><?= str_repeat('★', $store['atmosphere']) ?><?= str_repeat('☆', 5 - $store['atmosphere']) ?></p>
-      <p><strong>接客：</strong><?= str_repeat('★', $store['service']) ?><?= str_repeat('☆', 5 - $store['service']) ?></p>
+      <h3>総合評価</h3>
+      <p><?= $review_stars ?>（<?= $review_avg ?> / 5、<?= $review_count ?>件）</p>
     </div>
 
     <!-- 投稿フォーム -->
@@ -84,6 +74,15 @@ $reviews = [
 
         <label for="photo">写真（任意）</label>
         <input type="file" id="photo" name="photo">
+
+        <label for="rating">評価（1〜5）</label>
+        <select id="rating" name="rating">
+          <option value="1">★☆☆☆☆</option>
+          <option value="2">★★☆☆☆</option>
+          <option value="3">★★★☆☆</option>
+          <option value="4">★★★★☆</option>
+          <option value="5">★★★★★</option>
+        </select>
 
         <button type="submit" name="submit_review">投稿</button>
       </form>
