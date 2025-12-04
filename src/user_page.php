@@ -44,25 +44,25 @@ $shops=array(
     <!--アカウント情報-->
     <div class="info">
         <div>
-            <div class="item1">社員ID</div>
-            <!--<input type="text" placeholder="社員IDを入力">-->
+            <div class="item1">社員ID:</div>
+            <!--<input type="text" placeholder="<?php echo $info['社員番号ID'] ?>"-->
             <div><?php echo $info['社員番号ID'] ?></div><br>
         </div>
         <div>
-            <div class="item1">氏名</div>
-            <!--<input type="text" placeholder="姓"><input type="text" placeholder="名">-->
+            <div class="item1">氏名:</div>
+            <!--<input type="text" placeholder="<?php echo $info['姓'] ?>"><input type="text" placeholder="<?php echo$info['名'] ?>">-->
             <div><?php echo $info['姓'],$info['名'] ?></div><br>
         </div>
     </div>
     <div class="info1">
         <div>
-            <div class="item1">アカウント名</div>
-            <!--<input type="text" placeholder="アカウント名を入力">-->
+            <div class="item1">アカウント名:</div>
+            <!--<input type="text" placeholder="<?php echo $info['アカウント名'] ?>">-->
             <div><?php echo $info['アカウント名'] ?></div><br>
         </div>
         <div>
-            <div class="item1">フリガナ</div>
-            <!--<input type="text" placeholder="セイ"><input type="text" placeholder="メイ">-->
+            <div class="item1">フリガナ:</div>
+            <!--<input type="text" placeholder="<?php echo $info['セイ']?>"><input type="text" placeholder="<?php echo $info['メイ']?>">-->
             <div><?php echo $info['セイ'],$info['メイ'] ?></div><br>
         </div>
     </div>
