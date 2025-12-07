@@ -38,11 +38,11 @@ VALUES
 INSERT INTO t_rstinfo
  (rst_name,rst_address,start_time,end_time,tel_num,rst_holiday,rst_pay,user_id,discount)
 VALUES
- ('九産食堂','福岡県福岡市東区','08:00:00','17:00:00','000-000-0000','65','15','test','false')
+ ('九産食堂','福岡県福岡市東区','08:00:00','17:00:00','000-000-0000','65','15','test',0)
 ;
 
 INSERT INTO t_review
  (eval_point,review_comment,rst_id,user_id,rev_state)
 VALUES
- ('4','良かった','1','test','true')
+ ('4','良かった','1','test',1)
 ;
