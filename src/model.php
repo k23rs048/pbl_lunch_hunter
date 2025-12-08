@@ -4,13 +4,19 @@ class Model
 {
     protected $table;
     protected $db;
+
     protected static $conf = [
-        'host'=>'mysql','user'=>'root','pass'=>'root','dbname'=>'test'
+        'host'   => 'mysql',
+        'user'   => 'root',
+        'pass'   => 'root',
+        'dbname' => 'test'
     ];
 
     protected static $codes = [
-        'rst_holiday'=>['1'=>'日','2'=>'月','4'=>'火','8'=>'水','16'=>'木','32'=>'金','64'=>'土'],
-        'rst_pay'=>['1'=>'現金','2'=>'QRコード','4'=>'電子マネー','8'=>'クレジットカード']
+        'user_type'=>['1'=>'社員','9'=>'管理者'],
+        'rst_genre'=>['1'=>'うどん','2'=>'ラーメン','3'=>'その他麺類','4'=>'定食','5'=>'カレー','6'=>'ファストフード',
+        '7'=>'カフェ','8'=>'和食','9'=>'洋食','10'=>'焼肉','11'=>'中華','12'=>'その他'],
+        'rst_pay'=>['1'=>'現金','2'=>'QRコード','3'=>'電子マネー','4'=>'クレジットカード']
     ];
 
     function __construct($conf = null){
