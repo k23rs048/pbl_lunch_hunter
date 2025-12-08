@@ -32,8 +32,13 @@ $shops=array(
     '1'=>'割引無',
     ]
 );
-
 ?>
+
+<style>
+    .shop{
+        
+    }
+</style>
 
 <?php foreach ($infos as $info): ?>
     <div class="main">
