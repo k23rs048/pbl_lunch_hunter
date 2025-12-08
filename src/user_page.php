@@ -54,11 +54,6 @@ $shops=array(
         justify-content: flex-end;
     }
 
-    .info-area{
-        border:solid;
-        border-
-    }
-
     .info{
         margin: 30px;
         display: flex;
@@ -71,7 +66,7 @@ $shops=array(
     }
 
     .shop{
-        display:grid;
+        display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-auto-flow: column;
         gap: 10px;
@@ -79,8 +74,10 @@ $shops=array(
 
     .item{
         display: flex;
-        border:solid;
-        
+        border-radius: 10px;
+        border: 0.5px solid;
+        margin-bottom: 10px;
+        padding-left:15px;
     }
 
 </style>
