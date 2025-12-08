@@ -52,8 +52,6 @@ foreach ($reviews as $r) {
   </style>
 </head>
 <body>
-  <div class="container">
-    <p><strong>ログイン中：</strong><?= htmlspecialchars($user_name) ?>（ID: <?= htmlspecialchars($user_id) ?>）</p>
 
     <!-- 店舗情報 -->
     <div class="section">
