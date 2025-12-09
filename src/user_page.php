@@ -68,7 +68,7 @@ $shops=array(
 
     .shop{
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 10px;
     }
 
@@ -118,27 +118,27 @@ $shops=array(
         </div>
     </div>
 <div class="shop">
-<?php foreach ($shops as $shop): ?>
-    <!--投稿店舗-->
-        <div class="item">
-            <div class="shopi">
-                <h4>店舗名:<?php echo $shop['店舗名'] ?></h4>
-                <div class="star">
-                    <div>評価：</div>
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <?php echo $i<=(int)$shop['評価'] ? "★" : "☆" ?>
-                    <?php endfor; ?>
-                    <div><?php echo $shop['評価']?></div>
+    <?php foreach ($shops as $shop): ?>
+        <!--投稿店舗-->
+            <div class="item">
+                <div class="shopi">
+                    <h4>店舗名:<?php echo $shop['店舗名'] ?></h4>
+                    <div class="star">
+                        <div>評価：</div>
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <?php echo $i<=(int)$shop['評価'] ? "★" : "☆" ?>
+                        <?php endfor; ?>
+                        <div><?php echo $shop['評価']?></div>
+                    </div>
+                    <div>ジャンル:<?php echo $shop['ジャンル'] ?></div>
+                    <div><?php echo $shop['0']?></div>
                 </div>
-                <div>ジャンル:<?php echo $shop['ジャンル'] ?></div>
-                <div><?php echo $shop['0']?></div>
-            </div>
-            <div class="phot">
-                <a href="/src/detail.php">
-                    <img class="img" src="" alt="未登録">
-                </a>
+                <div class="phot">
+                    <a href="/src/detail.php">
+                        <img class="img" src="" alt="未登録">
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-<?php endforeach; ?>
+    <?php endforeach; ?>
 </div>
