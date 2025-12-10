@@ -103,6 +103,7 @@ $reports = array(
     .pop{
         margin-top: 40vh;
         margin-left: 50%;
+        box-shadow: 5px 5px 5px;
     }
 
     .star-rating {
@@ -155,6 +156,7 @@ $reports = array(
         <div class="left">
             <h3><?php echo htmlspecialchars($report['アカウント名']) ?></h3>
             <div class="star">
+
                 <!--<div>評価：</div>
                 <?php for ($i = 1; $i <= 5; $i++): ?>
                     <?php echo $i<=(int)$report['評価点'] ? "★" : "☆" ?>
@@ -165,7 +167,6 @@ $reports = array(
                 <?php $rate = (float)$report['評価点']; ?>
                 <div class="star-rating" style="--rate: <?= $rate ?>;"></div>
                 <div><?= htmlspecialchars($report['評価点']) ?></div>
-
             </div>
             <div class="kome">
                 <div><?php echo htmlspecialchars($report['コメント']) ?></div>
@@ -181,7 +182,7 @@ $reports = array(
             <h3>#<?php echo htmlspecialchars($report['ジャンル']) ?></h3>
             <p>通報内容：<?php echo htmlspecialchars($report['通報理由']) ?></p>
             <div class="btn2">
-                <button type="button" onclick="location.href='/src/rev_detail.php'">詳細</button>
+                <button type="button" onclick="location.href='?do=rev_detail.php'"><a href="?do=rev_detail.php">詳細</button>
                 <button type="button" onclick="location.href='cancel.php'">取り消し</button>
                 <button class="btn0" popovertarget="my-<?= $report['id'] ?>">削除</button>
             </div>
