@@ -1,161 +1,181 @@
 <?php
-if(isset($_SESSION['message'])){
-    echo "<p style='color:green'>{$_SESSION['message']}</p>";
-    unset($_SESSION['message']);
+require_once('model.php');
+$user_id = $_SESSION['user_id'] ?? null;
+
+$rst = new Restaurant();
+$user = new User();
+$review = new Review();
+
+// GETパラメータ取得
+$keyword  = $_GET['q'] ?? '';
+$selectedGenres = $_GET['genre'] ?? [];
+$discount  = isset($_GET['discount']);
+$favorite  = isset($_GET['favorite']);
+$sort      = $_GET['sort'] ?? '';
+$genres = isset($_GET['genre']) ? $_GET['genre'] : [];
+
+// ベースURL（閉じるボタン用）
+$baseUrl = strtok($_SERVER["REQUEST_URI"], '?');
+
+// 店舗一覧取得
+$rst_list_raw = $rst->getList();
+
+//お気に入り検索
+$user_FavoriteList = [];
+if ($user_id) {
+    $favorites = $user->get_favorite($user_id); // お気に入り店舗の詳細リスト
+    $user_FavoriteList = array_column($favorites, 'rst_id'); // rst_idだけ取り出す
 }
-// モックデータ（本来はDBから取得）
-$stores = [
-    ['name'=>'丸亀製麺 九産大前店','genres'=>['うどん','和食'],'discount'=>true,'favorite'=>true,'rating'=>4.0,'tags'=>['#うどん','#和食'],'registered_by'=>'九州男児','created_at'=>'2025-11-28'],
-    ['name'=>'博多一幸舎 本店','genres'=>['ラーメン','和食'],'discount'=>false,'favorite'=>true,'rating'=>4.5,'tags'=>['#ラーメン','#和食'],'registered_by'=>'井上','created_at'=>'2025-12-01'],
-    ['name'=>'大名カレー研究所','genres'=>['カレー','洋食'],'discount'=>true,'favorite'=>false,'rating'=>3.8,'tags'=>['#カレー','#洋食'],'registered_by'=>'研究員A','created_at'=>'2025-11-15'],
-    ['name'=>'中華厨房 天神店','genres'=>['中華'],'discount'=>false,'favorite'=>false,'rating'=>4.2,'tags'=>['#中華'],'registered_by'=>'天神太郎','created_at'=>'2025-12-02'],
-    ['name'=>'糸島カフェ 風の杜','genres'=>['カフェ','洋食'],'discount'=>true,'favorite'=>true,'rating'=>4.7,'tags'=>['#カフェ','#洋食'],'registered_by'=>'糸島人','created_at'=>'2025-11-30'],
-];
 
-// フォーム入力を取得
-$keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
-$genres  = isset($_GET['genre']) ? $_GET['genre'] : [];
-$discount= isset($_GET['discount']);
-$favorite= isset($_GET['favorite']);
-$sort    = isset($_GET['sort']) ? $_GET['sort'] : 'popularity';
-$page    = isset($_GET['page']) ? max(1,intval($_GET['page'])) : 1;
-$perPage = 3; // 1ページあたり表示件数
+// 詳細データ取得＋検索条件でフィルタ
+$rst_list_filtered = [];
+foreach ($rst_list_raw as $r) {
+  $detail = $rst->get_RstDetail(['rst_id' => $r['rst_id']]);
 
-// 絞り込み処理
-$filtered = array_filter($stores,function($s) use($keyword,$genres,$discount,$favorite){
-    $ok = true;
-    if($keyword!==''){
-        $ok = stripos($s['name'],$keyword)!==false;
-    }
-    if($ok && !empty($genres)){
-        $ok = count(array_intersect($s['genres'],$genres))>0;
-    }
-    if($ok && $discount){
-        $ok = $s['discount'];
-    }
-    if($ok && $favorite){
-        $ok = $s['favorite'];
-    }
-    return $ok;
-});
+  // キーワード
+  if ($keyword && stripos($detail['rst_name'], $keyword) === false) continue;
 
-// ソート処理
-usort($filtered,function($a,$b) use($sort){
-    if($sort==='new'){
-        return strtotime($b['created_at']) <=> strtotime($a['created_at']);
-    }
-    return $b['rating'] <=> $a['rating'];
-});
+  // ジャンル
+  if ($selectedGenres) {
+    $genreList = array_column($detail['rst_genre'] ?? [], 'genre');
+    if (!array_intersect($selectedGenres, $genreList)) continue;
+  }
 
-// ページネーション処理
-$total = count($filtered);
-$totalPages = max(1,ceil($total/$perPage));
-$page = min($page,$totalPages);
-$offset = ($page-1)*$perPage;
-$paginated = array_slice($filtered,$offset,$perPage);
+  // 割引
+  if ($discount && intval($detail['discount']) === 0) continue;
 
-// クエリを除いた現在ページのURL（閉じる用）
-$baseUrl = strtok($_SERVER['REQUEST_URI'], '?');
+  // お気に入り
+  if ($favorite && !in_array($r['rst_id'], $user_FavoriteList)) continue;
+
+  $rst_list_filtered[] = $detail;
+}
+
+// ----------------------
+// 並び順
+// ----------------------
+if ($sort === 'popularity') {
+  usort($rst_list_filtered, function ($a, $b) use ($review) {
+    $ra = $review->getList("rst_id = " . intval($a['rst_id']));
+    $rb = $review->getList("rst_id = " . intval($b['rst_id']));
+    $avgA = $ra ? array_sum(array_column($ra, 'eval_point')) / count($ra) : 0;
+    $avgB = $rb ? array_sum(array_column($rb, 'eval_point')) / count($rb) : 0;
+    return $avgB <=> $avgA;
+  });
+} elseif ($sort === 'new') {
+  usort($rst_list_filtered, function ($a, $b) {
+    return strtotime($b['created_at'] ?? '1970-01-01') <=> strtotime($a['created_at'] ?? '1970-01-01');
+  });
+}
+
+// ----------------------
+// ページネーション
+// ----------------------
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = max($page, 1);
+$limit = 15;
+$totalItems = count($rst_list_filtered);
+$totalPages = ceil($totalItems / $limit);
+$start = ($page - 1) * $limit;
+$displayList = array_slice($rst_list_filtered, $start, $limit);
 ?>
-<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<title>Lunch Hunter</title>
-<style>
-body { font-family: sans-serif; margin:0; background:#f7f7f7; }
-header { background:#fff; border-bottom:1px solid #ccc; padding:10px; display:flex; justify-content:space-between; }
-header .left a { color:#b91c1c; text-decoration:none; }
-header .right a { margin-left:15px; text-decoration:none; color:#333; }
 
-main { max-width:1000px; margin:20px auto; padding:0 15px; }
+<!-- 検索ボタン -->
+<div class="mb-3">
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#searchModal">
+    検索
+  </button>
+</div>
 
-/* 検索フォーム */
-.search-box { background:#fff; padding:15px; border:1px solid #ddd; margin-bottom:20px; }
-.search-box input[type=text] { width:60%; padding:5px; }
-.search-box button { margin-left:5px; }
-.genre-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin:10px 0; }
-
-/* 店舗カード一覧 */
-.store-list { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
-.store { background:#fff; border:1px solid #ddd; border-radius:6px; overflow:hidden; }
-.store img { width:100%; height:150px; object-fit:cover; }
-.store .info { padding:10px; }
-.store .info div { margin-bottom:5px; }
-.store .rating { color:#d97706; font-weight:bold; }
-
-/* ページネーション */
-.pagination { text-align:center; margin-top:20px; }
-.pagination a { margin:0 5px; text-decoration:none; color:#333; }
-.pagination a.active { font-weight:bold; color:#0366d6; }
-
-/* ボタン風リンク */
-.btn-secondary { background:#e5e7eb; color:#111; padding:6px 10px; border-radius:6px; text-decoration:none; }
-</style>
-</head>
-<body>
-
-<main>
-  <!-- 検索フォーム -->
-  <div class="search-box">
-    <form method="get" action="">
-      <label>キーワード入力:</label>
-      <input type="text" name="q" value="<?=htmlspecialchars($keyword)?>">
-      <button type="submit">決定</button>
-      <!-- 閉じるはクエリを消して未検索状態へ -->
-      <a href="<?=$baseUrl?>" class="btn-secondary">閉じる</a>
-      
-      <div style="margin-top:10px;">
-        <button name="sort" value="popularity">人気順</button>
-        <button name="sort" value="new">新着順</button>
-      </div>
-      
-      <div style="margin-top:10px;"><strong>ジャンル:</strong></div>
-      <div class="genre-grid">
-        <?php foreach(['うどん','ラーメン','定食','カレー','ファーストフード','カフェ','焼肉','和食','洋食','中華','その他'] as $g): ?>
-          <label><input type="checkbox" name="genre[]" value="<?=$g?>" <?=in_array($g,$genres)?'checked':''?>><?=$g?></label>
-        <?php endforeach; ?>
-      </div>
-      
-      <div style="margin-top:10px;">
-        <label><input type="checkbox" name="discount" <?= $discount?'checked':''?>>割引有り</label>
-        <label><input type="checkbox" name="favorite" <?= $favorite?'checked':''?>>お気に入り店舗</label>
-      </div>
-    </form>
-  </div>
-
-  <!-- 店舗一覧 -->
-  <div class="store-list">
-    <?php if(empty($paginated)): ?>
-      <p>条件に一致する店舗がありません。</p>
-    <?php else: ?>
-      <?php foreach($paginated as $s): ?>
-        <div class="store">
-          <img src="https://via.placeholder.com/300x150" alt="外観写真">
-          <div class="info">
-            <div>店舗名：<?=$s['name']?> <?= $s['discount']?'<span style="color:green;">割引有</span>':''?></div>
-            <div class="rating">
-              <?=str_repeat('★',(int)$s['rating'])?><?=str_repeat('☆',5-(int)$s['rating'])?> <?=$s['rating']?>
+<!-- 検索モーダル -->
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="get" action="">
+        <!-- モーダルヘッダー -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="searchModalLabel">店舗検索</h5>
+        </div>
+        <!-- モーダル本文（キーワード・ジャンル・割引など） -->
+        <div class="modal-body">
+          <div class="search-box">
+            <label>キーワード入力:</label>
+            <input type="text" name="q" value="<?= htmlspecialchars($keyword) ?>">
+            <div style="margin-top:10px;">
+              <button name="sort" value="popularity">人気順</button>
+              <button name="sort" value="new">新着順</button>
             </div>
-            <div><?=implode(' ',$s['tags'])?></div>
-            <div>登録者：<?=$s['registered_by']?></div>
+
+            <div style="margin-top:10px;"><strong>ジャンル:</strong></div>
+            <div class="genre-grid">
+              <?php foreach (['うどん', 'ラーメン', '定食', 'カレー', 'ファーストフード', 'カフェ', '焼肉', '和食', '洋食', '中華', 'その他'] as $g) : ?>
+                <label><input type="checkbox" name="genre[]" value="<?= $g ?>" <?= in_array($g, $genres) ? 'checked' : '' ?>><?= $g ?></label>
+              <?php endforeach; ?>
+            </div>
+
+            <div style="margin-top:10px;">
+              <label><input type="checkbox" name="discount" <?= $discount ? 'checked' : '' ?>>割引有り</label>
+              <label><input type="checkbox" name="favorite" <?= $favorite ? 'checked' : '' ?>>お気に入り店舗</label>
+            </div>
+          </div>
+        </div>
+        <!-- モーダルフッター（閉じる・検索ボタン） -->
+        <div class="modal-footer">
+          <a href="<?= $baseUrl ?>" class="btn btn-secondary">閉じる</a>
+          <button type="submit" class="btn btn-primary">検索</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 店舗一覧表示 -->
+<div class="container">
+  <h2>店舗一覧</h2>
+
+  <?php if (empty($displayList)) : ?>
+    <p>条件に一致する店舗がありません。</p>
+  <?php else : ?>
+    <div class="row">
+      <?php foreach ($displayList as $s) : ?>
+        <div class="col-md-4 mb-4">
+          <div class="store-card p-3 h-100 border rounded shadow-sm">
+            <img src="<?= htmlspecialchars($s['photo1'] ?? 'https://via.placeholder.com/300x150') ?>" class="img-fluid mb-3" alt="外観写真">
+            <h4><?= htmlspecialchars($s['rst_name']) ?> <?= $s['discount'] ? '<span style="color:green;">割引有</span>' : '' ?></h4>
+
+            <!-- 評価 -->
+            <div class="rating mb-2">
+              <?php
+              $review_data = $review->getList("rst_id = " . intval($s['rst_id']));
+              $rating = 0;
+              if (!empty($review_data)) {
+                for ($i = 0; $i < count($review_data); $i++) {
+                  $rating += intval($review_data[$i]['eval_point']);
+                }
+                $rating = $rating / count($review_data);
+              }
+              $stars = round($rating);
+              ?>
+              <?= str_repeat('★', $stars) ?><?= str_repeat('☆', 5 - $stars) ?> <?= $stars ?>
+            </div>
+
+            <p>ジャンル: <?= htmlspecialchars(implode(' ', array_column($s['rst_genre'] ?? [], 'genre')), ENT_QUOTES, 'UTF-8') ?></p>
+            <p>登録者: <?= htmlspecialchars($user->get_Userdetail(['user_id' => $s['user_id']])['user_account'] ?? '') ?></p>
           </div>
         </div>
       <?php endforeach; ?>
-    <?php endif; ?>
-  </div>
+    </div>
+  <?php endif; ?>
 
   <!-- ページネーション -->
-  <div class="pagination">
-    <?php for($i=1;$i<=$totalPages;$i++): ?>
-      <?php
+  <nav>
+    <ul class="pagination">
+      <?php for ($i = 1; $i <= $totalPages; $i++) :
         $qs = $_GET;
-        $qs['page']=$i;
-        $url='?'.http_build_query($qs);
+        $qs['page'] = $i;
+        $url = '?' . http_build_query($qs);
       ?>
-      <a href="<?=$url?>" class="<?=($i==$page)?'active':''?>"><?=$i?></a>
-    <?php endfor; ?>
-  </div>
-</main>
-</body>
-</html>
+        <li class="<?= ($i == $page) ? 'active' : '' ?>"><a href="<?= $url ?>"><?= $i ?></a></li>
+      <?php endfor; ?>
+    </ul>
+  </nav>
+</div>

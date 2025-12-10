@@ -196,7 +196,7 @@ class User extends Model
     //お気に入り店舗
     function get_favorite($user_id)
     {
-        $sql = "SELECT rst_id FROM t_favorite WHERE user_id = {$user_id}";
+        $sql = "SELECT rst_id FROM t_favorite WHERE user_id = '{$user_id}'";
         $favorites = $this->query($sql);
         $favorite = [];
         foreach ($favorites as $fav) {
