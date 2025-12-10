@@ -9,6 +9,7 @@ $reports = array(
         'コメント'=> '店主が臭い',
         '通報者'=> '九尾 太郎',
         '投稿主'=> '美輪 明宏',
+        '非表示'=>'1',
     ],
     [
         'id'=> '2',
@@ -19,6 +20,8 @@ $reports = array(
         'コメント'=> 'コメント一部',
         '通報者'=> '通報者',
         '投稿主'=> '投稿主',
+        '非表示'=>'0',
+        '取り消し'=>'1',
     ],
     [
         'id'=> '3',
@@ -29,6 +32,7 @@ $reports = array(
         'コメント'=> '店主が臭い',
         '通報者'=> '九尾 太郎',
         '投稿主'=> '美輪 明宏',
+        '非表示'=>'1',
     ],
     [
         'id'=> '4',
@@ -39,6 +43,8 @@ $reports = array(
         'コメント'=> 'コメント一部',
         '通報者'=> '通報者',
         '投稿主'=> '投稿主',
+        '非表示'=>'0',
+        '取り消し'=>'1',
     ]
 );
 ?>
@@ -88,22 +94,25 @@ $reports = array(
         padding: 8px;      
         margin-top: 5px;   
         border-radius: 5px;
-        background-color:red;
     }
 
     .small{
         font-size:12px
     }
 
-    .btn2{
+    .btn02{
+        width:100px;
         display: flex;
         flex-direction: column;
+        gap:5px;
     }
 
     .pop{
         margin-top: 40vh;
         margin-left: 50%;
+        box-shadow: 5px 5px 5px;
     }
+
 
     .star-rating {
     --rate: 0;        /* 0〜5 の小数(0.1 刻みなど)を直接入れる */
@@ -142,7 +151,7 @@ $reports = array(
 <h1 class="report_title">通報済み口コミ一覧表示</h1>
 
 <div class="top-btn">
-    <button type="button">通報取り消し一覧</button>
+    <button type="button" id="cancelFilterBtn">通報取り消し一覧</button>
     <button type="button" id="hidbtn">非表示</button>
     <button type="button" id="sortBtn">並び替え（新着順）</button>
 </div>
@@ -155,6 +164,7 @@ $reports = array(
         <div class="left">
             <h3><?php echo htmlspecialchars($report['アカウント名']) ?></h3>
             <div class="star">
+
                 <!--<div>評価：</div>
                 <?php for ($i = 1; $i <= 5; $i++): ?>
                     <?php echo $i<=(int)$report['評価点'] ? "★" : "☆" ?>
@@ -165,7 +175,6 @@ $reports = array(
                 <?php $rate = (float)$report['評価点']; ?>
                 <div class="star-rating" style="--rate: <?= $rate ?>;"></div>
                 <div><?= htmlspecialchars($report['評価点']) ?></div>
-
             </div>
             <div class="kome">
                 <div><?php echo htmlspecialchars($report['コメント']) ?></div>
@@ -179,12 +188,7 @@ $reports = array(
 
         <div class="right">
             <h3>#<?php echo htmlspecialchars($report['ジャンル']) ?></h3>
-            <p>通報内容：<?php echo htmlspecialchars($report['通報理由']) ?></p>
-            <div class="btn2">
-                <button type="button" onclick="location.href='/src/rev_detail.php'">詳細</button>
-                <button type="button" onclick="location.href='cancel.php'">取り消し</button>
-                <button class="btn0" popovertarget="my-<?= $report['id'] ?>">削除</button>
-            </div>
+            <div>通報内容：<?php echo htmlspecialchars($report['通報理由']) ?></div>
 
             <div class="pop" popover="manual" id="my-<?= $report['id'] ?>">
                 <p>本当に削除しますか？</p>
@@ -194,19 +198,38 @@ $reports = array(
                      </div>
             </div>
         </div>
+    <div class="btn02">
+        <button type="button" onclick="location.href='?do=rev_detail.php'"><a href="?do=rev_detail.php">詳細</a></button>
+        <button type="button">取り消し</button>
+        <button class="btn0" popovertarget="my-<?= $report['id'] ?>">削除</button>
+    </div>
     </section>
 <?php endforeach; ?>
 </div>
 
 <script>
     let reports = <?php echo json_encode($reports); ?>;
-    let isDesc = false;
+    let isDesc = false; 
+    let hideMode = false;
+    let cancelMode = false;
 
     const renderReports = () => {
         const area = document.getElementById("reportArea");
         area.innerHTML = "";
 
-        reports.forEach(report => {
+        let list = reports;
+
+        if (hideMode) {
+            list = list.filter(r => r['非表示'] === '1');
+        }
+
+        if (cancelMode) {
+            list = list.filter(r => r['取り消し'] === '1');
+        }
+
+        if (isDesc) list = [...list].reverse();
+
+        list.forEach(report => {
             area.innerHTML += `
             <section class="report-box">
                 <div class="left">
@@ -215,7 +238,10 @@ $reports = array(
                         <p>評価：${report['評価点']}</p>
                         <div class="star-rating" style="--rate:${parseFloat(report['評価点'])}"></div>
                     </div>
-                    <p>${report['コメント']}</p>
+                    <div class="kome">
+                        <div>${report['コメント']}</div>
+                    </div>
+                    
                     <div class="small">
                         <p>投稿主：${report['通報者']}</p>
                         <p>通報者：${report['投稿主']}</p>
@@ -223,11 +249,8 @@ $reports = array(
                 </div>
                 <div class="right">
                     <h3>#${report['ジャンル']}</h3>
-                    <p>通報内容：${report['通報理由']}</p>
-                    <button type="button" onclick="location.href='detail.php?id=${report['id']}'">詳細</button>
-                    <button type="button" onclick="location.href='cancel.php?id=${report['id']}'">取り消し</button>
-                    <button class="btn0" popovertarget="my-<?= $report['id'] ?>">削除</button>
-            
+                    <div>通報内容：${report['通報理由']}</div> 
+
                     <div class="pop" popover="manual" id="my-<?= $report['id'] ?>">
                         <p>本当に削除しますか？</p>
                         <div class="yn">
@@ -235,26 +258,45 @@ $reports = array(
                             <button type="button" onclick="document.getElementById('my-<?= $report['id'] ?>').hidePopover()">no</button>
                         </div>
                     </div>
-                </div>
+                </div> 
+            <div class="btn02">
+                <button type="button" onclick="location.href='detail.php?id=${report['id']}'">詳細</button>
+                <button type="button">取り消し</button>
+                <button class="btn0" popovertarget="my-<?= $report['id'] ?>">削除</button>
+            </div>       
             </section>
             `;
         });
     };
+
+    
 
     // 初回描画
     renderReports();
 
     // 並び替えボタン
     document.getElementById("sortBtn").onclick = () => {
-        isDesc = !isDesc;
-        reports.reverse();
+    isDesc = !isDesc;
 
-        document.getElementById("sortBtn").innerText = isDesc 
-            ? "並び替え（古い順）"
-            : "並び替え（新着順）";
+    document.getElementById("sortBtn").innerText = isDesc 
+        ? "並び替え（古い順）"
+        : "並び替え（新着順）";
 
+    renderReports();
+    };
+
+    document.getElementById("hidbtn").onclick = () => {
+        hideMode = !hideMode;
+        document.getElementById("hidbtn").innerText = hideMode ? "全件表示" : "非表示";
         renderReports();
     };
+
+    document.getElementById("cancelFilterBtn").onclick = () => {
+        cancelMode = !cancelMode;
+        document.getElementById("cancelFilterBtn").innerText = cancelMode ? "一覧" : "取り消し一覧";
+        renderReports();
+    };
+
 </script>
 
 </body>

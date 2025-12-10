@@ -1,34 +1,43 @@
 <?php
 require_once('model.php');
 $model = new User();
+$rstModel= new Restaurant();
 
 //userのセッションを確認
 $user_id = $_SESSION['user_id'];
 
 //userのデータを取得
 $mydata = $model -> getDetail("user_id='{$user_id}'");
-print_r($mydata);
+
+
+//print_r($mydata);
+
+
 //姓名を結合
 $mydata['name'] = $model -> username($mydata);
 $mydata['kana'] = $model -> userkana($mydata);
 
+
+
+
+
 $shops=array(
     [
     '店舗名'=>'丸亀製麵',
-    '評価'=>'5',
+    '評価'=>'3.2',
     'ジャンル'=>'うどん 和食',
     '0'=>'割引有',
     ],
     [
     '店舗名'=>'あああ',
-    '評価'=>'1',
+    '評価'=>'1.4',
     'ジャンル'=>'いいい',
     '0'=>'割引有',
     '1'=>'割引無',
     ],
     [
     '店舗名'=>'あああ',
-    '評価'=>'1',
+    '評価'=>'1.5',
     'ジャンル'=>'いいい',
     '0'=>'割引有',
     '1'=>'割引無',
@@ -41,7 +50,7 @@ $shops=array(
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通報済み口コミ一覧</title>
+    <title>MY PAGE</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -68,7 +77,7 @@ $shops=array(
 
     .shop{
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 10px;
     }
 
@@ -81,8 +90,42 @@ $shops=array(
         border-radius: 10px;
         border: 0.5px solid;
         margin-bottom: 10px;
-        padding-left:15px;
+        padding:15px;
+        gap:30px;
     }
+    .item:hover{
+        box-shadow: 0.5px 0.5px 3px;
+    }
+
+    .star-rating {
+    --rate: 0;        /* 0〜5 の小数(0.1 刻みなど)を直接入れる */
+    --size: 20px;
+    --star-color: #ccc;
+    --star-fill: gold;
+
+    font-size: var(--size);
+    font-family: "Arial", sans-serif;
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+    }
+
+    .star-rating::before {
+        content: "★★★★★";
+        color: var(--star-color);
+    }
+
+    .star-rating::after {
+        content: "★★★★★";
+        color: var(--star-fill);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: calc(var(--rate) * 20%);  /* ★ 小数点をそのまま使用（0.1 → 2%） */
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
 
 </style>
     <div class="main">
@@ -95,50 +138,59 @@ $shops=array(
         <div class="info">
             <div>
                 <div class="item1">社員番号ID:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['user_id'] ?>"-->
                 <div><?php echo $mydata['user_id'] ?></div><br>
             </div>
             <div>
                 <div class="item1">氏名:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['name'] ?>"><input type="text" placeholder="<?php echo$info['名'] ?>">-->
                 <div><?php echo $mydata['name'] ?></div><br>
             </div>
         </div>
         <div class="info1">
             <div>
                 <div class="item1">アカウント名:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['user_account'] ?>">-->
                 <div><?php echo $mydata['user_account'] ?></div><br>
             </div>
             <div>
                 <div class="item1">フリガナ:</div>
-                <!--<input type="text" placeholder="<?php echo $mydata['kana']?>"><input type="text" placeholder="<?php echo $info['メイ']?>">-->
                 <div><?php echo $mydata['kana'] ?></div><br>
             </div>
         </div>
     </div>
-<?php foreach ($shops as $shop): ?>
-    <!--投稿店舗-->
-    <div class="shop">
-        <div class="item">
-            <div class="shopi">
-                <h4>店舗名:<?php echo $shop['店舗名'] ?></h4>
-                <div class="star">
-                    <div>評価：</div>
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <?php echo $i<=(int)$shop['評価'] ? "★" : "☆" ?>
-                    <?php endfor; ?>
-                    <div><?php echo $shop['評価']?></div>
+<!--投稿店舗-->
+<div class="shop">
+    <!--$shops as $shop-->
+    <?php foreach ($shops as $shop): ?>
+            <div class="item">
+                <div class="shopi">
+                    <h4>店舗名:<?php echo $shop['店舗名'] ?></h4>
+                    <div class="star">
+                        <!--<div>評価：</div>
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <?php echo $i<=(int)$shop['評価'] ? "★" : "☆" ?>
+                        <?php endfor; ?>
+                        <div><?php echo $shop['評価']?></div>-->
+
+                        <div>評価：</div>
+                        <?php $rate = (float)$shop['評価']; ?>
+                        <div class="star-rating" style="--rate: <?= $rate ?>;"></div>
+                        <div><?= htmlspecialchars($shop['評価']) ?></div>
+
+                    </div>
+                    <div>ジャンル:<?php echo $shop['ジャンル'] ?></div>
+                    <div><?php echo $shop['0']?></div>
                 </div>
-                <div>ジャンル:<?php echo $shop['ジャンル'] ?></div>
-                <div><?php echo $shop['0']?></div>
+                <div class="phot">
+                    <a href="/src/detail.php">
+                        <img class="img" src="" alt="未登録">
+                    </a>
+                </div>
             </div>
-            <div class="phot">
-                <a href="/src/detail.php">
-                    <img class="img" src="" alt="未登録">
-                </a>
-            </div>
-        </div>
-    </div>
-<?php endforeach; ?>
+
+            <script>
+                <div class="star">
+                    <p>評価：${shop['評価']}</p>
+                    <div class="star-rating" style="--rate:${parseFloat(shop['評価'])}"></div>
+                </div>
+            </script>
+    <?php endforeach; ?>
 </div>
