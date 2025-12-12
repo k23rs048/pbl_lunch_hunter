@@ -31,6 +31,8 @@ switch ($mode) {
         //print_r($_FILES);
         //print_r($data);
         $review_save->update($data, 'review_id=' . $review_id);
+        header('Location:?do=rst_detail&rst_id=' . $data['rst_id'] . '');
+        exit;
         break;
         // ★ 新規作成
     case 'create':
