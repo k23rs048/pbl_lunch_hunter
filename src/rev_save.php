@@ -58,7 +58,7 @@ switch ($mode) {
         if ($rev_id == null || $repo_id == null) exit('Invalid rev_id');
 
         $review->update(['rev_state' => 1], ['review_id' => $rev_id]);
-        $report->update(['report_state' => 3], ['report_id' => $repo_id]);
+        $report->update(['report_state' => 3], ['review_id' => $rev_id]);
         header('Location:?do=rev_report');
         exit;
         break;
@@ -68,7 +68,7 @@ switch ($mode) {
         if ($rev_id == null || $repo_id == null) exit('Invalid rev_id');
 
         $review->update(['rev_state' => 0], ['review_id' => $rev_id]);
-        $report->update(['report_state' => 2], ['report_id' => $repo_id]);
+        $report->update(['report_state' => 2], ['review_id' => $rev_id]);
         header('Location:?do=rev_report');
         exit;
         break;

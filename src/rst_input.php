@@ -35,6 +35,10 @@
 
     <form action="?do=rst_save" method="post" enctype="multipart/form-data">
 
+        <input type="hidden" name="mode" value="insert">
+        <input type="hidden" name="current_photo_path" value="<?= htmlspecialchars($old['photo1'] ?? '') ?>">
+        <input type="hidden" name="delete_photo_flag" id="delete_photo_flag" value="0">
+
         <div class="registration-container">
             <div class="left-col">
 
@@ -110,8 +114,8 @@
                     <span class="required-star">*必須</span><br>
                     <?php
                     $genres = [
-                        1 => 'うどん', 2 => 'ラーメン', 3 => 'その他麺類', 4 => '定食',5 => 'カレー', 
-                        6 => 'ファストフード', 7 => 'カフェ', 8 => '和食', 9 => '洋食', 10 => '焼肉', 11 => '中華',12 => 'その他'
+                        1 => 'うどん', 2 => 'ラーメン', 3 => 'その他麺類', 4 => '定食', 5 => 'カレー',
+                        6 => 'ファストフード', 7 => 'カフェ', 8 => '和食', 9 => '洋食', 10 => '焼肉', 11 => '中華', 12 => 'その他'
                     ];
                     foreach ($genres as $val => $label) :
                     ?>
@@ -150,16 +154,23 @@
                 <!-- 写真 -->
                 <div class="form-group">
                     <label for="photo_file">写真</label>
-                    <span class="optional-hash">#任意</span><br>
                     <input type="file" id="photo_file" name="photo_file" accept="image/*">
-                    <img id="preview_img" src="" alt="選択した写真のプレビュー" style="max-width:200px; display:none; border:1px solid #ccc; margin-top:10px;" />
-                    <button id="delete_btn" type="button" style="display:none; margin-left:10px;">削除</button>
+
+                    <!-- 既存写真がある場合は表示 -->
+                    <?php if (!empty($old['photo1'])) : ?>
+                        <img id="preview_img" src="<?= htmlspecialchars($old['photo1']) ?>" style="max-width:200px; display:inline-block; border:1px solid #ccc; margin-top:10px;">
+                        <button type="button" id="delete_btn" style="margin-left:10px;">削除</button>
+                    <?php else : ?>
+                        <img id="preview_img" src="" style="max-width:200px; display:none; border:1px solid #ccc; margin-top:10px;">
+                        <button type="button" id="delete_btn" style="display:none; margin-left:10px;">削除</button>
+                    <?php endif; ?>
                 </div>
 
                 <script>
                     const fileInput = document.getElementById("photo_file");
                     const previewImg = document.getElementById("preview_img");
                     const deleteBtn = document.getElementById("delete_btn");
+                    const deleteFlag = document.getElementById("delete_photo_flag");
 
                     fileInput.addEventListener("change", function(event) {
                         const file = event.target.files[0];
@@ -169,6 +180,7 @@
                                 previewImg.src = e.target.result;
                                 previewImg.style.display = "inline-block";
                                 deleteBtn.style.display = "inline-block";
+                                deleteFlag.value = "0"; // 新しい写真選択したら削除フラグリセット
                             };
                             reader.readAsDataURL(file);
                         }
@@ -179,6 +191,7 @@
                         previewImg.style.display = "none";
                         deleteBtn.style.display = "none";
                         fileInput.value = "";
+                        deleteFlag.value = "1"; // 削除フラグ立てる
                     });
                 </script>
 

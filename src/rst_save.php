@@ -49,29 +49,28 @@ if ($mode === 'insert' || $mode === 'update') {
         $pay = array_sum($_POST['payment'] ?? []);
 
         // 写真処理
-        $photo_file = $_POST['current_photo_path'] ?? ''; // デフォルトは既存写真
-        $delete_photo = isset($_POST['delete_photo_flag']) && $_POST['delete_photo_flag'] == '1';
+        $photo_file = $_POST['current_photo_path'] ?? '';
+        $delete_photo = ($_POST['delete_photo_flag'] ?? '0') === '1';
 
-        // 削除フラグが立っていれば既存写真を削除
-        if (!empty($_POST['delete_photo_flag']) && $_POST['delete_photo_flag'] === '1') {
-            // ファイル削除
-            if (!empty($_POST['current_photo_path']) && file_exists($_POST['current_photo_path'])) {
-                unlink($_POST['current_photo_path']);
-            }
-            $data['photo1'] = '';
+        $upload_dir = 'uploads/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+        if ($delete_photo && !empty($photo_file) && file_exists($photo_file)) {
+            unlink($photo_file);
+            $photo_file = '';
         }
 
-        // 新しい写真アップロードがあれば上書き
+        // 新規アップロード
         if (isset($_FILES['photo_file']) && $_FILES['photo_file']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = 'uploads/';
-            if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-            $new_photo = basename($_FILES['photo_file']['name']);
-            move_uploaded_file($_FILES['photo_file']['tmp_name'], $upload_dir . $new_photo);
-            $photo_file = $upload_dir . $new_photo;
-
-            // 古い写真が残っていたら削除
-            if (!empty($_POST['current_photo_path']) && file_exists($_POST['current_photo_path'])) {
-                unlink($_POST['current_photo_path']);
+            $tmp_name = $_FILES['photo_file']['tmp_name'];
+            $ext = pathinfo($_FILES['photo_file']['name'], PATHINFO_EXTENSION);
+            $new_name = $upload_dir . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            if (move_uploaded_file($tmp_name, $new_name)) {
+                // 古い写真が残っていたら削除
+                if (!empty($photo_file) && file_exists($photo_file)) {
+                    unlink($photo_file);
+                }
+                $photo_file = $new_name;
             }
         }
 
@@ -131,7 +130,7 @@ if ($mode === 'insert' || $mode === 'update') {
         $rows_fav  = $favorite->delete(['rst_id' => $rst_id]);
         $rows_rev  = $rev->delete(['rst_id' => $rst_id]);
         $rows_genre = $genre->delete(['rst_id' => $rst_id]);
-        
+
         $total_rows = $rows_repo + $rows_fav + $rows_rev + $rows_genre + $rows_rst;
     }
 }

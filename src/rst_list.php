@@ -74,7 +74,28 @@ $totalPages = ceil($totalItems / $limit);
 $start = ($page - 1) * $limit;
 $displayList = array_slice($rst_list_filtered, $start, $limit);
 ?>
+<style>
+.store-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+    height: 300px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.store-card img {
+    max-width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+.rating {
+    color: orange;
+}
 
+</style>
 <!-- 検索ボタン -->
 <div class="mb-3">
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#searchModal">

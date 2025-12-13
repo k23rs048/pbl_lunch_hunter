@@ -16,29 +16,6 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js'></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
-<style>
-.store-card {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 15px;
-    height: 300px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-.store-card img {
-    max-width: 100%;
-    height: 150px;
-    object-fit: cover;
-    margin-bottom: 10px;
-}
-.rating {
-    color: orange;
-}
-
-</style>
-
 <?php
 function h($str)
 {

@@ -13,7 +13,10 @@ if($user){
     $_SESSION['user_password'] = $user['password'];
     $_SESSION['usertype_id'] = $user['usertype_id'];
     header('Location:index.php');
+    exit;
 } else {
+    $_SESSION['error'] = true;
     header('Location:?do=user_login');
+    exit;
 }
 ?>
