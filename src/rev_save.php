@@ -6,8 +6,8 @@ $report = new Report();
 
 function readBlob($key)
 {
-    if (!empty($_FILES[$key]['tmp_name'])) {
-        return file_get_contents($_FILES[$key]['tmp_name']);
+    if (!empty($_FILES['img']['tmp_name'][$key])) {
+        return file_get_contents($_FILES['img']['tmp_name'][$key]);
     }
     return null;
 }
@@ -26,11 +26,18 @@ switch ($mode) {
         //編集
         $review_id = $_POST['review_id'];
         $data = [
-            'eval_point' => $_POST['point'], 'review_comment' => $_POST['comment'] ?? null, 'rst_id' => $_POST['rst_id'], 'user_id' => $_POST['user_id'], 'photo1' => readBlob(0), 'photo2' => readBlob(1), 'photo3' => readBlob(2), 'rev_state' => true
+            'eval_point'      => $_POST['eval_point'],
+            'review_comment'  => $_POST['review_comment'] ?? null,
+            'rst_id' => $_POST['rst_id'], 
+            'user_id' => $_POST['user_id'], 
+            'photo1' => readBlob(0), 
+            'photo2' => readBlob(1), 
+            'photo3' => readBlob(2), 
+            'rev_state' => true
         ];
         //print_r($_FILES);
         //print_r($data);
-        $review_save->update($data, 'review_id=' . $review_id);
+        $review->update($data, 'review_id=' . $review_id);
         header('Location:?do=rst_detail&rst_id=' . $data['rst_id'] . '');
         exit;
         break;
@@ -41,12 +48,13 @@ switch ($mode) {
             'review_comment'  => $_POST['review_comment'] ?? null,
             'rst_id'          => $_POST['rst_id'],
             'user_id'         => $_SESSION['user_id'],
-            'photo1'          => readBlob('photo1'),
-            'photo2'          => readBlob('photo2'),
-            'photo3'          => readBlob('photo3'),
+            'photo1'          => readBlob(0),
+            'photo2'          => readBlob(1),
+            'photo3'          => readBlob(2),
             'rev_state'       => 1
         ];
-
+        //print_r($data);
+        //print_r($_FILES);
         $review->insert($data);
         // 終了後リダイレクト
         header('Location:?do=rst_detail&rst_id=' . $data['rst_id'] . '');
