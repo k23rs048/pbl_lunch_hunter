@@ -14,18 +14,19 @@ switch ($mode) {
         //登録
         $user_account = "{$_POST['user_l_name']}{$_POST['user_f_name']}";
         $user = array(
-            'user_id' => $_POST['user_id'],
-            'password' => $_POST['pass'],
-            'user_l_name' => $_POST['user_l_name'],
-            'user_f_name' => $_POST['user_f_name'],
-            'user_l_kana' => $_POST['user_l_kana'],
-            'user_f_kana' => $_POST['user_f_kana'],
-            'user_account' => $user_account,
-            'usertype_id' => 1
+
+            'user_id' =>$_POST['user_id'],
+            'password' =>$_POST['pass'],
+            'user_l_name'=>$_POST['user_l_name'], 
+            'user_f_name'=>$_POST['user_f_name'], 
+            'user_l_kana'=>$_POST['user_l_kana'], 
+            'user_f_kana'=>$_POST['user_f_kana'], 
+            'user_account'=>$user_account,
+            'usertype_id'=>1
         );
 
         //
-        if (empty($userold['user_id'])) {
+        if(!empty($userold['user_id'])){
             header('Location:?do=user_input&msg=2');
         }
         //テストコード
